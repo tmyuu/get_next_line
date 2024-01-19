@@ -9,6 +9,7 @@
         "string_view": "c",
         "unordered_map": "c",
         "vector": "c",
-        "get_next_line.h": "c"
+        "get_next_line.h": "c",
+        "stdio.h": "c"
     }
 }
