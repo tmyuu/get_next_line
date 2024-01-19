@@ -6,107 +6,138 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:28 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/19 14:36:57 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/19 20:29:44 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-t_list	*ft_malloc_lst(t_list *lst)
+size_t	ft_get_bytesize(t_list *lst)
 {
-	if (lst == NULL)
+	size_t	bytesize;
+
+	bytesize = 0;
+	while (lst->line) //大事
 	{
-		lst = (t_list *)malloc(sizeof(t_list));
-		if (!lst)
-			return (NULL);
-		lst->size = 0;
-		lst->content = NULL;
-		lst->next = NULL;
+		bytesize += lst->bytesize;
+		lst = lst->next;
 	}
-	return (lst);
+	if (bytesize == 0)
+		return (bytesize);
+	return (bytesize + 1);
 }
 
-char	*ft_malloc_content(t_list *lst, t_list *tmp, char *line)
+size_t	ft_get_next_bytesize(char *line, t_list *lst)
+{
+	size_t	bytesize;
+	char	*tmp;
+
+	bytesize = 0;
+	while (line)
+	{
+		if (*line == '\n')
+			break ;
+		else if (*line == '\0')
+			break ;
+		line++;
+		bytesize++;
+	}
+	return (bytesize);
+}
+
+size_t	ft_read_line(int fd, t_list *lst, char *line)
 {
 	size_t	i;
+	size_t	bytesize;
 
-	i = 0;
-	if (lst->size == 0)
+	if (ft_get_bytesize(lst) % BUFFER_SIZE == 0)
 	{
-		tmp->content = (char *)malloc(sizeof(char) * (tmp->size + 1));
-		if (!tmp->content)
-			ft_free_lst(lst);
+		bytesize = read(fd, line, BUFFER_SIZE);
+		if (bytesize < 0)
+		{
+			free(line);
+			return (-1);
+		}
+		else if (bytesize == 0)
+			return (0);
+		line[bytesize] = '\0';
 	}
-	else if (lst->size < 0)
-		ft_free_lst(lst);
-	else
-	{
-		tmp->content = (char *)malloc(sizeof(char) * (lst->size + tmp->size
-					+ 1));
-		if (!tmp->content)
-			ft_free_lst(lst);
-	}
-	while (i < tmp->size)
-		tmp->content[i++] = line[lst->size++];
-	tmp->content[i] = '\0';
-	return (tmp->content);
+	bytesize = ft_get_next_bytesize(line, lst);
+	return (bytesize);
 }
 
-char	*ft_malloc_line(size_t size)
+char	*ft_copy_line(t_list *lst, char *line)
 {
-	char	*line;
+	char	*tmp;
+	char	*head;
 
-	line = (char *)malloc(sizeof(char) * (size + BUFFER_SIZE + 1));
-	if (!line)
-		return (NULL);
-	return (line);
-}
-
-void	ft_free_lst(t_list *lst)
-{
-	t_list	*tmp;
-
-	while (lst)
+	tmp = ft_malloc_line(tmp);
+	head = tmp;
+	while (line)
 	{
-		tmp = lst->next;
-		free(lst->content);
-		free(lst);
-		lst = tmp;
+		if (*line == '\n')
+			break ;
+		else if (*line == '\0')
+			break ;
+		*tmp = *line;
+		tmp++;
+		line++;
 	}
+	*tmp = '\0';
+	return (head);
 }
 
 char	*get_next_line(int fd)
 {
 	static t_list	*lst = NULL;
-	t_list			*tmp;
-	size_t			size;
+	static t_list	*head = NULL;
+	static t_list	*point = NULL;
 	char			*line;
 
-	tmp = NULL;
-	lst = ft_malloc_lst(lst);
-	tmp = ft_malloc_lst(tmp);
-	size = ft_lstadd_and_sizeget(lst, tmp);
-	line = ft_malloc_line(size);
-	size = ft_read(fd, lst, line);
-	tmp->size = ft_size(lst, line);
-	tmp->content = ft_malloc_content(lst, tmp, line);
+	if (!lst)
+	{
+		lst = ft_malloc_lst(lst);
+		head = lst;
+	}
+	else if (lst->next)
+		lst = lst->next;
+	line = ft_malloc_line(line);
+	while (line)
+	{
+		lst->bytesize = ft_read_line(fd, head, line);
+		lst->line = ft_copy_line(head, line);
+		line += (lst->bytesize + 1);
+		lst->next = ft_malloc_lst(lst->next);
+		lst = lst->next;
+		if (*line == '\0')
+			break ;
+	}
+	if (!point)
+	{
+		point = head;
+		return (point->line);
+	}
+	point = point->next;
 	free(line);
-	if (tmp->size == 0)
-		ft_free_lst(lst);
-	return (tmp->content);
+	return (point->line);
 }
 
 int	main(void)
 {
-	char	*line;
-	int		fd;
+	int fd;
+	char *line;
 
 	fd = open("test.txt", O_RDONLY);
-	while ((line = get_next_line(fd)))
-	{
-		printf("%s\n", line);
-		free(line);
-	}
-	close(fd);
-	return (0);
+	line = get_next_line(fd);
+	printf("line = %s\n", line);
+	line = get_next_line(fd);
+	printf("line = %s\n", line);
+	line = get_next_line(fd);
+	printf("line = %s\n", line);
+	line = get_next_line(fd);
+	printf("line = %s\n", line);
+	line = get_next_line(fd);
+	printf("line = %s\n", line);
+	line = get_next_line(fd);
+	printf("line = %s\n", line);
 }
