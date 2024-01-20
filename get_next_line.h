@@ -6,11 +6,11 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:30 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/20 16:03:52 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/20 22:11:11 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define BUFFER_SIZE 15
+#define BUFFER_SIZE 10
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>

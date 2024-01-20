@@ -6,7 +6,7 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:26 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/20 15:29:21 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/20 19:51:08 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ char	*ft_malloc_line(char *line, size_t bytesize)
 		line = (char *)malloc(sizeof(char) * (bytesize + 1));
 		if (!line)
 			return (NULL);
+		line[bytesize] = '\0';
 	}
 	else
 		return (NULL);

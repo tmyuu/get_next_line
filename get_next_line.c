@@ -6,25 +6,34 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:28 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/20 16:06:38 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/20 22:14:32 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_strdup_line(t_list *lst, char *line)
+size_t	ft_strlen(char *line)
 {
 	size_t	i;
-	char	*tmp;
 
 	i = 0;
 	while (line[i] != '\0')
 	{
 		if (line[i] == '\n')
+		{
+			i++;
 			break ;
+		}
 		i++;
 	}
-	tmp = ft_malloc_line(tmp, i);
+	return (i);
+}
+
+char	*ft_strdup_line(t_list *lst, char *line)
+{
+	char	*tmp;
+
+	tmp = ft_malloc_line(tmp, ft_strlen(line));
 	if (!tmp)
 		return (NULL);
 	lst->line = tmp;
@@ -49,7 +58,7 @@ ssize_t	ft_copy_line(t_list *lst, char *line, ssize_t bytesize)
 	while (*tmp != '\0')
 	{
 		tmp = ft_strdup_line(lst, tmp);
-		if (!tmp && !lst->line)
+		if (*tmp && !lst->line)
 			return (-1);
 		if (bytesize > 0)
 			lst->call = 1;
@@ -97,19 +106,20 @@ char	*get_next_line(int fd)
 	if (!lst)
 	{
 		lst = ft_malloc_lst(lst);
+		if (!lst)
+			return (NULL);
 		head = lst;
 		lst->call = ft_read_line(fd, lst);
-		return (lst->line);
+		return (head->line);
 	}
 	if (lst->next)
 		lst = lst->next;
-	if (lst->call > 1)
+	if (lst->call > 0 && !lst->next)
 	{
 		lst->next = ft_malloc_lst(lst->next);
 		if (!lst->next)
-			lst->call = -1;
+			lst->next->call = -1;
 		lst->call = ft_read_line(fd, lst->next);
-		return (lst->line);
 	}
 	if (lst->call == -1)
 	{
@@ -117,7 +127,10 @@ char	*get_next_line(int fd)
 		return (NULL);
 	}
 	else if (lst->call == 0 && !lst->next)
-		lst = head;
+	{
+		ft_free_lst(head);
+		return (NULL);
+	}
 	return (lst->line);
 }
 
@@ -127,6 +140,44 @@ int	main(void)
 	char	*line;
 
 	fd = open("test.txt", O_RDONLY);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
+	line = get_next_line(fd);
+	printf("%s\n", line);
 	line = get_next_line(fd);
 	printf("%s\n", line);
 	line = get_next_line(fd);
