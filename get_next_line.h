@@ -6,11 +6,11 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:30 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/20 02:07:08 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/20 16:03:52 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #define BUFFER_SIZE 16
+#define BUFFER_SIZE 15
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -25,9 +25,9 @@ typedef struct s_list
 }					t_list;
 
 char				*get_next_line(int fd);
-void				ft_read_line(int fd, t_list *lst, char *line);
-ssize_t				ft_read(int fd, char *buf, size_t size);
-char				*ft_copy_line(char *line, char *lstline);
 t_list				*ft_free_lst(t_list *lst);
 t_list				*ft_malloc_lst(t_list *lst);
-char				*ft_malloc_line(char *line);
+char				*ft_malloc_line(char *line, size_t bytesize);
+char				*ft_strdup_line(t_list *lst, char *line);
+ssize_t				ft_copy_line(t_list *lst, char *line, ssize_t bytesize);
+ssize_t				ft_read_line(int fd, t_list *lst);
