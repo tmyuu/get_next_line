@@ -6,11 +6,11 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:30 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/22 14:00:36 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/23 12:14:26 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define BUFFER_SIZE 5
+// #define BUFFER_SIZE 4
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -24,11 +24,12 @@ typedef struct s_list
 	struct s_list	*next;
 }					t_list;
 
-t_list				*ft_free_lst(t_list *lst);
-t_list				*ft_malloc_lst(void);
-char				*ft_malloc_line(size_t bytesize);
 size_t				ft_strlen(char *line);
 char				*ft_strdup_line(t_list *lst, char *line);
 ssize_t				ft_copy_line(t_list *lst, char *line);
 ssize_t				ft_read_line(int fd, t_list *lst);
+t_list				*ft_strjoin(t_list *lst);
+t_list				*ft_free_lst(t_list *lst);
+t_list				*ft_malloc_lst(void);
+char				*ft_malloc_line(size_t size);
 char				*get_next_line(int fd);

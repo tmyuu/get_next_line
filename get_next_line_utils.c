@@ -6,11 +6,36 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:26 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/22 13:28:33 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/23 12:12:10 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+t_list	*ft_strjoin(t_list *lst)
+{
+	char	*line;
+	char	*nextline;
+	char	*tmp;
+	char	*head;
+
+	line = lst->line;
+	nextline = lst->next->line;
+	tmp = ft_malloc_line(ft_strlen(line) + ft_strlen(nextline));
+	if (!tmp)
+		return (NULL);
+	head = tmp;
+	while (*line != '\0')
+		*tmp++ = *line++;
+	if (nextline)
+		while (*nextline != '\0')
+			*tmp++ = *nextline++;
+	*tmp = '\0';
+	lst = ft_free_lst(lst);
+	free(lst->line);
+	lst->line = head;
+	return (lst);
+}
 
 t_list	*ft_free_lst(t_list *lst)
 {
