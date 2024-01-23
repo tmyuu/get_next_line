@@ -6,11 +6,11 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:30 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/23 12:14:26 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/23 16:37:01 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// #define BUFFER_SIZE 4
+#define BUFFER_SIZE 1
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -32,4 +32,5 @@ t_list				*ft_strjoin(t_list *lst);
 t_list				*ft_free_lst(t_list *lst);
 t_list				*ft_malloc_lst(void);
 char				*ft_malloc_line(size_t size);
+void				*malloc(size_t size);
 char				*get_next_line(int fd);

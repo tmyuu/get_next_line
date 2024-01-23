@@ -6,7 +6,7 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:26 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/23 12:12:10 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/23 16:36:47 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,11 +44,13 @@ t_list	*ft_free_lst(t_list *lst)
 	if (lst)
 	{
 		tmp = lst->next;
-		free(lst->line);
+		if (lst->line)
+			free(lst->line);
 		free(lst);
-		return (tmp);
 	}
-	return (NULL);
+	else
+		tmp = NULL;
+	return (tmp);
 }
 
 t_list	*ft_malloc_lst(void)
@@ -68,14 +70,9 @@ char	*ft_malloc_line(size_t bytesize)
 {
 	char	*tmp;
 
-	if (bytesize > 0)
-	{
-		tmp = (char *)malloc(sizeof(char) * (bytesize + 1));
-		if (!tmp)
-			return (NULL);
-		tmp[bytesize] = '\0';
-	}
-	else
+	tmp = (char *)malloc(sizeof(char) * (bytesize + 1));
+	if (!tmp)
 		return (NULL);
+	tmp[bytesize] = '\0';
 	return (tmp);
 }
