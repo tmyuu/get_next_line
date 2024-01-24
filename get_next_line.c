@@ -6,127 +6,128 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:28 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/23 16:36:41 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/25 01:32:18 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(char *line)
+ssize_t	ft_read(int fd, t_list *lst)
 {
-	size_t	i;
-
-	i = 0;
-	if (line)
-	{
-		while (line[i] != '\0')
-		{
-			if (line[i] == '\n')
-				return (i + 1);
-			i++;
-		}
-	}
-	return (i);
-}
-
-char	*ft_strdup_line(t_list *lst, char *line)
-{
-	char	*tmp;
-
-	tmp = ft_malloc_line(ft_strlen(line));
-	if (!tmp)
-		return (NULL);
-	lst->line = tmp;
-	while (*line != '\0')
-	{
-		if (*line == '\n')
-		{
-			*tmp++ = *line++;
-			lst->call = 1;
-			break ;
-		}
-		*tmp++ = *line++;
-	}
-	*tmp = '\0';
-	return (line);
-}
-
-ssize_t	ft_copy_line(t_list *lst, char *line)
-{
+	ssize_t	size;
 	ssize_t	call;
 
-	call = 1;
-	while (*line != '\0')
-	{
-		if (lst->line)
-		{
-			lst->next = ft_malloc_lst();
-			if (!lst->next)
-				return (-1);
-			lst = lst->next;
-		}
-		line = ft_strdup_line(lst, line);
-		if (!lst->line || !line)
-			return (-1);
-	}
-	return (call);
-}
-
-ssize_t	ft_read_line(int fd, t_list *lst)
-{
-	ssize_t	bytesize;
-	ssize_t	call;
-	char	*line;
-
-	call = 0;
-	line = ft_malloc_line(BUFFER_SIZE);
-	if (!line)
+	lst->str = ft_malloc_str(BUFFER_SIZE);
+	if (!lst->str)
 		return (-1);
-	bytesize = read(fd, line, BUFFER_SIZE);
-	if (bytesize < 0)
+	size = read(fd, lst->str, BUFFER_SIZE);
+	if (size < 0)
 		return (-1);
-	else if (bytesize > 0)
+	else if (size == 0)
+		return (0);
+	else
 	{
-		line[bytesize] = '\0';
-		call = ft_copy_line(lst, line);
-		while (lst->next != NULL)
-			lst = lst->next;
+		lst->str[size] = '\0';
 		lst->next = ft_malloc_lst();
 		if (!lst->next)
 			return (-1);
-		else
-			call = ft_read_line(fd, lst->next);
+		lst = lst->next;
 	}
-	free(line);
-	return (call);
+	call = ft_read(fd, lst);
+	if (call < 0)
+		return (-1);
+	else
+		size += call;
+	return (size);
+}
+
+char	*ft_strjoin(char *str, t_list *lst)
+{
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	j = 0;
+	while (lst)
+	{
+		if (lst->str[j] == '\0')
+		{
+			if (lst->next && lst->next->next)
+				lst = lst->next;
+			else
+				break ;
+			j = 0;
+		}
+		str[i++] = lst->str[j++];
+	}
+	return (str);
+}
+
+char	*ft_strread(int fd)
+{
+	ssize_t	size;
+	t_list	*lst;
+	char	*str;
+
+	lst = ft_malloc_lst();
+	if (!lst)
+		return (NULL);
+	size = ft_read(fd, lst);
+	if (size > 0)
+		str = ft_malloc_str(size);
+	if (size <= 0 || !str)
+	{
+		lst = ft_free_lst(lst);
+		return (NULL);
+	}
+	str = ft_strjoin(str, lst);
+	lst = ft_free_lst(lst);
+	return (str);
 }
 
 char	*get_next_line(int fd)
 {
-	static t_list	*lst = NULL;
+	static char	*str = NULL;
 
-	if (!lst)
+	// static char	*tmp = NULL;
+	if (!str)
 	{
-		lst = ft_malloc_lst();
-		if (!lst)
+		str = ft_strread(fd);
+		if (!str)
 			return (NULL);
-		if (ft_read_line(fd, lst) < 0)
-		{
-			while (lst->next != NULL)
-				lst = ft_free_lst(lst);
-		}
 	}
-	else if (lst->call == 1)
-		lst = ft_free_lst(lst);
-	if (lst->call == 0)
-	{
-		if (lst->next == NULL)
-			lst = ft_free_lst(lst);
-		else
-			while (lst->call == 0 && lst->next != NULL)
-				lst = ft_strjoin(lst);
-	}
-	if (!lst)
-		return (NULL);
-	return (lst->line);
+	// tmp = ft_strcpy(str);
+	// return (tmp);
+	// if (!tmp)
+	// {
+	// 	if (str)
+	// 		free(str);
+	// 	str = NULL;
+	// 	return (NULL);
+	// }
+	// str = ft_strmove(str, tmp);
+	// return (tmp);
+	return (str);
 }
+
+// int	main(void)
+// {
+// 	int		fd;
+// 	char	*line;
+
+// 	fd = open("test.txt", O_RDONLY);
+// 	line = get_next_line(fd);
+// 	// while (line)
+// 	// {
+// 	// 	printf("%s", line);
+// 	// 	free(line);
+// 	// 	line = get_next_line(fd);
+// 	// }
+// 	printf("%s", line);
+// 	free(line);
+// 	// line = get_next_line(fd);
+// 	// printf("%s", line);
+// 	// free(line);
+// 	close(fd);
+// 	return (0);
+// }

@@ -5,74 +5,107 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/09 16:15:26 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/23 16:36:47 by ymatsui          ###   ########.fr       */
+/*   Created: 2024/01/24 17:58:54 by ymatsui           #+#    #+#             */
+/*   Updated: 2024/01/25 01:31:17 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-t_list	*ft_strjoin(t_list *lst)
+char	*ft_strmove(char *str, char *tmp)
 {
-	char	*line;
-	char	*nextline;
-	char	*tmp;
-	char	*head;
+	size_t	i;
+	size_t	j;
 
-	line = lst->line;
-	nextline = lst->next->line;
-	tmp = ft_malloc_line(ft_strlen(line) + ft_strlen(nextline));
+	i = 0;
+	while (tmp[i] != '\0')
+		i++;
+	if (!str || str[i] == '\0')
+	{
+		free(str);
+		str = NULL;
+		return (NULL);
+	}
+	j = 0;
+	while (str[i] != '\0')
+		str[j++] = str[i++];
+	while (str[j] != '\0')
+		str[j++] = '\0';
+	return (str);
+}
+
+char	*ft_strcpy(char *str)
+{
+	size_t	i;
+	size_t	j;
+	char	*tmp;
+
+	i = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '\n')
+		{
+			i++;
+			break ;
+		}
+		i++;
+	}
+	tmp = ft_malloc_str(i);
 	if (!tmp)
 		return (NULL);
-	head = tmp;
-	while (*line != '\0')
-		*tmp++ = *line++;
-	if (nextline)
-		while (*nextline != '\0')
-			*tmp++ = *nextline++;
-	*tmp = '\0';
-	lst = ft_free_lst(lst);
-	free(lst->line);
-	lst->line = head;
-	return (lst);
+	i = 0;
+	j = 0;
+	while (tmp[i] != '\0')
+		tmp[i++] = str[j++];
+	return (tmp);
 }
 
 t_list	*ft_free_lst(t_list *lst)
 {
 	t_list	*tmp;
 
-	if (lst)
+	tmp = NULL;
+	while (lst)
 	{
-		tmp = lst->next;
-		if (lst->line)
-			free(lst->line);
+		if (lst->next)
+		{
+			tmp = lst->next;
+			lst->next = NULL;
+		}
+		else
+			tmp = NULL;
+		if (lst->str)
+		{
+			free(lst->str);
+			lst->str = NULL;
+		}
 		free(lst);
+		lst = tmp;
 	}
-	else
-		tmp = NULL;
 	return (tmp);
 }
 
 t_list	*ft_malloc_lst(void)
 {
-	t_list	*tmp;
+	t_list	*lst;
 
-	tmp = (t_list *)malloc(sizeof(t_list));
-	if (!tmp)
+	lst = (t_list *)malloc(sizeof(t_list));
+	if (!lst)
 		return (NULL);
-	tmp->call = 0;
-	tmp->line = NULL;
-	tmp->next = NULL;
-	return (tmp);
+	lst->str = NULL;
+	lst->next = NULL;
+	return (lst);
 }
 
-char	*ft_malloc_line(size_t bytesize)
+char	*ft_malloc_str(size_t size)
 {
-	char	*tmp;
+	char	*str;
 
-	tmp = (char *)malloc(sizeof(char) * (bytesize + 1));
-	if (!tmp)
+	if (size < 0)
 		return (NULL);
-	tmp[bytesize] = '\0';
-	return (tmp);
+	str = (char *)malloc(sizeof(char) * (size + 1));
+	if (!str)
+		return (NULL);
+	str[size] = '\0';
+	return (str);
 }
