@@ -12,6 +12,7 @@
         "get_next_line.h": "c",
         "stdio.h": "c",
         "unistd.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "sstream": "c"
     }
 }
