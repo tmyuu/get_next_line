@@ -5,128 +5,161 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/09 16:15:28 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/23 16:36:41 by ymatsui          ###   ########.fr       */
+/*   Created: 2024/01/25 11:14:50 by ymatsui           #+#    #+#             */
+/*   Updated: 2024/01/26 15:42:19 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(char *line)
+ssize_t	ft_split(t_list *lst, ssize_t i)
 {
-	size_t	i;
+	ssize_t	j;
 
-	i = 0;
-	if (line)
+	j = 0;
+	lst->next->str = lst->str;
+	lst->str = (char *)malloc(sizeof(char) * (i + 1));
+	if (!lst->str)
+		lst->size = -1;
+	else
 	{
-		while (line[i] != '\0')
+		lst->size = i;
+		while (j < i)
 		{
-			if (line[i] == '\n')
-				return (i + 1);
-			i++;
+			lst->str[j] = lst->next->str[j];
+			j++;
 		}
+		lst->str[j] = '\0';
+		j = 0;
+		while (lst->next->str[i] != '\0')
+			lst->next->str[j++] = lst->next->str[i++];
+		lst->next->size = j;
+		while (j < i)
+			lst->next->str[j++] = '\0';
 	}
-	return (i);
+	return (lst->size);
 }
 
-char	*ft_strdup_line(t_list *lst, char *line)
+ssize_t	ft_strjoin(t_list *lst)
 {
+	ssize_t	i;
 	char	*tmp;
 
-	tmp = ft_malloc_line(ft_strlen(line));
+	i = 0;
+	tmp = (char *)malloc(sizeof(char) * (lst->size + lst->next->size + 1));
 	if (!tmp)
-		return (NULL);
-	lst->line = tmp;
-	while (*line != '\0')
+		lst->size = -1;
+	else
 	{
-		if (*line == '\n')
+		while (i < lst->size)
 		{
-			*tmp++ = *line++;
-			lst->call = 1;
-			break ;
+			tmp[i] = lst->str[i];
+			i++;
 		}
-		*tmp++ = *line++;
-	}
-	*tmp = '\0';
-	return (line);
-}
-
-ssize_t	ft_copy_line(t_list *lst, char *line)
-{
-	ssize_t	call;
-
-	call = 1;
-	while (*line != '\0')
-	{
-		if (lst->line)
-		{
-			lst->next = ft_malloc_lst();
-			if (!lst->next)
-				return (-1);
-			lst = lst->next;
-		}
-		line = ft_strdup_line(lst, line);
-		if (!lst->line || !line)
-			return (-1);
-	}
-	return (call);
-}
-
-ssize_t	ft_read_line(int fd, t_list *lst)
-{
-	ssize_t	bytesize;
-	ssize_t	call;
-	char	*line;
-
-	call = 0;
-	line = ft_malloc_line(BUFFER_SIZE);
-	if (!line)
-		return (-1);
-	bytesize = read(fd, line, BUFFER_SIZE);
-	if (bytesize < 0)
-		return (-1);
-	else if (bytesize > 0)
-	{
-		line[bytesize] = '\0';
-		call = ft_copy_line(lst, line);
-		while (lst->next != NULL)
-			lst = lst->next;
+		i = 0;
+		while (i < lst->next->size)
+			tmp[lst->size++] = lst->next->str[i++];
+		tmp[lst->size] = '\0';
+		free(lst->str);
+		lst->str = tmp;
+		lst->next = ft_free_lst(lst->next);
 		lst->next = ft_malloc_lst();
-		if (!lst->next)
-			return (-1);
-		else
-			call = ft_read_line(fd, lst->next);
 	}
-	free(line);
-	return (call);
+	return (lst->size);
+}
+
+t_list	*ft_strcheck(int fd, t_list *lst)
+{
+	ssize_t	i;
+	ssize_t	call;
+
+	i = 0;
+	while (lst->str[i] != '\n' && lst->str[i] != '\0')
+		i++;
+	if (lst->str[i] == '\n')
+	{
+		call = ft_split(lst, i + 1);
+		if (lst->next->size == 0)
+			lst->next = ft_free_lst(lst->next);
+	}
+	else
+	{
+		call = ft_read(fd, lst->next);
+		if (call > 0)
+			call = ft_strjoin(lst);
+		else if (call < 0)
+			lst->size = -1;
+		else if (call == 0)
+			lst->next = ft_free_lst(lst->next);
+	}
+	if (call < 0)
+		lst = ft_free_lst(lst);
+	return (lst);
+}
+
+ssize_t	ft_read(int fd, t_list *lst)
+{
+	lst->str = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!lst->str)
+		lst->size = -1;
+	else
+	{
+		lst->size = read(fd, lst->str, BUFFER_SIZE);
+		if (lst->size > 0)
+		{
+			lst->str[lst->size] = '\0';
+			lst->next = ft_malloc_lst();
+		}
+		else
+		{
+			free(lst->str);
+			lst->str = NULL;
+		}
+	}
+	return (lst->size);
 }
 
 char	*get_next_line(int fd)
 {
 	static t_list	*lst = NULL;
+	char			*str;
 
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
 	if (!lst)
 	{
 		lst = ft_malloc_lst();
 		if (!lst)
 			return (NULL);
-		if (ft_read_line(fd, lst) < 0)
-		{
-			while (lst->next != NULL)
-				lst = ft_free_lst(lst);
-		}
-	}
-	else if (lst->call == 1)
-		lst = ft_free_lst(lst);
-	if (lst->call == 0)
-	{
-		if (lst->next == NULL)
+		if (ft_read(fd, lst) <= 0)
 			lst = ft_free_lst(lst);
-		else
-			while (lst->call == 0 && lst->next != NULL)
-				lst = ft_strjoin(lst);
 	}
-	if (!lst)
-		return (NULL);
-	return (lst->line);
+	else
+		lst->next = ft_malloc_lst();
+	while (lst && lst->next && lst->next->size == 0)
+		lst = ft_strcheck(fd, lst);
+	str = ft_strcpy(lst);
+	if (!str)
+		lst = ft_free_lst(lst);
+	else
+		lst = ft_next(lst);
+	return (str);
 }
+
+// int	main(void)
+// {
+// 	int		fd;
+// 	char	*line;
+
+// 	fd = open("text.txt", O_RDONLY);
+// 	line = get_next_line(fd);
+// 	while (line)
+// 	{
+// 		printf("%s", line);
+// 		free(line);
+// 		line = get_next_line(fd);
+// 	}
+// 	free(line);
+// 	close(fd);
+// 	return (0);
+// }
