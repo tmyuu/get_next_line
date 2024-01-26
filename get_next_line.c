@@ -6,7 +6,7 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/25 11:14:50 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/26 17:30:06 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/26 17:44:55 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ char	*get_next_line(int fd)
 	static t_list	*lst = NULL;
 	char			*str;
 
-	if (fd < 0 || (ssize_t)BUFFER_SIZE <= 0)
+	if (fd < 0 || (ssize_t)BUFFER_SIZE <= 0 || (ssize_t)BUFFER_SIZE > INT_MAX)
 		return (NULL);
 	if (!lst)
 	{
@@ -151,7 +151,7 @@ char	*get_next_line(int fd)
 // 	int		fd;
 // 	char	*line;
 
-// 	fd = open("text.txt", O_RDONLY);
+// 	fd = open("get_next_line.c", O_RDONLY);
 // 	line = get_next_line(fd);
 // 	while (line)
 // 	{
