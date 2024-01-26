@@ -6,18 +6,19 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/09 16:15:30 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/26 17:13:58 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/26 17:24:55 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 # include <fcntl.h>
+# include <limits.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1
+#  define BUFFER_SIZE INT_MAX
 # endif
 
 typedef struct s_list

@@ -6,7 +6,7 @@
 /*   By: ymatsui <ymatsui@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/25 11:14:50 by ymatsui           #+#    #+#             */
-/*   Updated: 2024/01/26 17:10:30 by ymatsui          ###   ########.fr       */
+/*   Updated: 2024/01/26 17:27:07 by ymatsui          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,12 +99,12 @@ t_list	*ft_strcheck(int fd, t_list *lst)
 
 ssize_t	ft_read(int fd, t_list *lst)
 {
-	lst->str = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	lst->str = (char *)malloc(sizeof(char) * ((ssize_t)BUFFER_SIZE + 1));
 	if (!lst->str)
 		lst->size = -1;
 	else
 	{
-		lst->size = read(fd, lst->str, BUFFER_SIZE);
+		lst->size = read(fd, lst->str, (ssize_t)BUFFER_SIZE);
 		if (lst->size > 0)
 		{
 			lst->str[lst->size] = '\0';
@@ -124,7 +124,7 @@ char	*get_next_line(int fd)
 	static t_list	*lst = NULL;
 	char			*str;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || (ssize_t)BUFFER_SIZE <= 0)
 		return (NULL);
 	if (!lst)
 	{
@@ -146,20 +146,20 @@ char	*get_next_line(int fd)
 	return (str);
 }
 
-// int	main(void)
-// {
-// 	int		fd;
-// 	char	*line;
+int	main(void)
+{
+	int		fd;
+	char	*line;
 
-// 	fd = open("text.txt", O_RDONLY);
-// 	line = get_next_line(fd);
-// 	while (line)
-// 	{
-// 		printf("%s", line);
-// 		free(line);
-// 		line = get_next_line(fd);
-// 	}
-// 	free(line);
-// 	close(fd);
-// 	return (0);
-// }
+	fd = open("text.txt", O_RDONLY);
+	line = get_next_line(fd);
+	while (line)
+	{
+		printf("%s", line);
+		free(line);
+		line = get_next_line(fd);
+	}
+	free(line);
+	close(fd);
+	return (0);
+}
