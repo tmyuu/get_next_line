@@ -99,12 +99,12 @@ t_list	*ft_strcheck(int fd, t_list *lst)
 
 ssize_t	ft_read(int fd, t_list *lst)
 {
-	lst->str = (char *)malloc(sizeof(char) * ((ssize_t)BUFFER_SIZE + 1));
+	lst->str = (char *)malloc(sizeof(char) * ((size_t)BUFFER_SIZE + 1));
 	if (!lst->str)
 		lst->size = -1;
 	else
 	{
-		lst->size = read(fd, lst->str, (ssize_t)BUFFER_SIZE);
+		lst->size = read(fd, lst->str, BUFFER_SIZE);
 		if (lst->size > 0)
 		{
 			lst->str[lst->size] = '\0';
@@ -124,7 +124,7 @@ char	*get_next_line(int fd)
 	static t_list	*lst = NULL;
 	char			*str;
 
-	if (fd < 0 || (ssize_t)BUFFER_SIZE <= 0 || (ssize_t)BUFFER_SIZE > INT_MAX)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	if (!lst)
 	{
